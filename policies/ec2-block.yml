@@ -1,0 +1,10 @@
+policies:
+  - name: ec2-stop-running-instances
+    resource: ec2
+    mode:
+      type: ec2-instance-state
+      events:
+        - running
+    actions:
+      - stop
+
