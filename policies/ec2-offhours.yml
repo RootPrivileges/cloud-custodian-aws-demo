@@ -1,0 +1,39 @@
+policies:
+  - name: stop-after-hours
+    description: |
+      Shutdown all running EC2 instances that have the tag
+      `CustodianOffHours` applied.
+    resource: ec2
+    mode:
+      type: periodic
+      schedule: "rate(1 hour)"
+    filters:
+      - type: offhour
+        tag: CustodianOffHours
+        default_tz: Europe/London
+        offhour: 22
+      - type: instance-age
+        hours: 1
+    actions:
+      - stop
+
+  - name: start-after-hours
+    description: |
+      Start all stopped EC2 instances that have the tag
+      `CustodianOffHours` applied.
+    resource: ec2
+    mode:
+      type: periodic
+      schedule: "rate(1 hour)"
+    filters:
+      - type: onhour
+        tag: CustodianOffHours
+        default_tz: Europe/London
+        onhour: 8
+      - type: value
+        value: 1
+        key: LaunchTime
+        op: less-than
+        value_type: age
+    actions:
+      - start
